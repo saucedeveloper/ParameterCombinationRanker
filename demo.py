@@ -1,6 +1,4 @@
 from combination_ranker import Parameter, ParameterValueSet, Finder
-from functools import reduce
-from dataclasses import dataclass
 
 
 def main() -> None:
@@ -12,11 +10,17 @@ def main() -> None:
     def proximity_exp(value: float, target: float) -> float:
         return math.exp(-(value - target) ** 2)
 
+    def coef_a(r1: float, r2: float, c1: float, c2: float) -> float:
+        return (r1 * c1) / (r2 * c2)
+
+    def coef_t(r2: float, c2: float) -> float:
+        return r2 * c2
+
     def score(r1: float, r2: float, c1: float, c2: float) -> float:
-        return proximity_exp(r2 * c2, 0.76) * proximity_exp((r1 * c1) / (r2 * c2), 10)
+        return proximity_exp(coef_t(r2, c2), 0.76) * proximity_exp(coef_a(r1, r2, c1, c2), 10)
 
     def interpretation(r1: float, r2: float, c1: float, c2: float) -> str:
-        return f"T={r2 * c2}, a={(r1 * c1) / (r2 * c2)}"
+        return f"T={coef_t(r2, c2)}, a={coef_a(r1, r2, c1, c2)}"
 
     rn = 1
     r_set = ParameterValueSet({
